@@ -11,7 +11,7 @@ class UMMEG(object):
     Solve time harmonic Maxwell's equation.
     curl (mu^{-1} curl E) - C E = F     in R^2
 
-    with Silver-Muller boundary condition.
+    with PEC boundary.
 
     The functions E, C, B, F, g are complex-valued.
     The relative permeability mu is real-valued.
@@ -47,10 +47,10 @@ class UMMEG(object):
         V = self.finite_element_space.TestFunction()
 
         A = BilinearForm(self.finite_element_space, symmetric=True)
-        A += SymbolicBFI((1.0/self.permeability) * curl(U) * curl(V))
-        A += SymbolicBFI(-self.C_r * U * V)
-        A += SymbolicBFI(-1J * self.C_c * U * V)
-        A += SymbolicBFI(-1J * self.frequency * U.Trace() * V.Trace(), BND)
+        A += (1.0/self.permeability) * curl(U) * curl(V) * dx 
+        A += -self.C_r * U * V * dx 
+        A += -1J * self.C_c * U * V * dx 
+        A += -1J * self.frequency * U.Trace() * V.Trace() * ds
 
         b = LinearForm (self.finite_element_space)
         b += SymbolicLFI(1J * self.frequency * self.source * V)
@@ -66,10 +66,17 @@ class UMMEG(object):
 
         # VTKOutput object
         vtk = VTKOutput(ma=self.mesh,
-                        coefs=[SOL.real, SOL.imag],
-                        names=["solution"],
-                        filename=filename_str,
-                        subdivision=3)
+                        coefs=[SOL.real],
+                        names=["solution_real"],
+                        filename=filename_str + '_real')
+        # Exporting the results:
+        vtk.Do()
+
+        # VTKOutput object
+        vtk = VTKOutput(ma=self.mesh,
+                        coefs=[SOL.imag],
+                        names=["solution_imag"],
+                        filename=filename_str + '_imag')
         # Exporting the results:
         vtk.Do()
 
