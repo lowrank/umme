@@ -1,7 +1,7 @@
 from dolfin import *
 import matplotlib.pyplot as plt
 from matplotlib import interactive
-
+import numpy as np
 class MEG(object):
     """
     Solve time harmonic Maxwell's equation. 
@@ -45,17 +45,17 @@ class MEG(object):
         self._set_boundary(args.ibc)
 
     def _set_finite_element(self, scalar_elem, vector_elem, deg):
-        s_elem = FiniteElement(
+        self.s_elem = FiniteElement(
             scalar_elem, cell=self.mesh.ufl_cell(), degree=deg)
 
-        self.scalar_space = FunctionSpace(self.mesh, s_elem)
+        self.scalar_space = FunctionSpace(self.mesh, self.s_elem)
 
-        v_elem = FiniteElement(
+        self.v_elem = FiniteElement(
             vector_elem, cell=self.mesh.ufl_cell(), degree=deg)
 
         self.vector_space = VectorFunctionSpace(self.mesh, scalar_elem, degree=deg)
 
-        mix_elem = MixedElement([v_elem, v_elem])
+        mix_elem = MixedElement([self.v_elem, self.v_elem])
 
         self.tensor_space = FunctionSpace(self.mesh, mix_elem)
 
@@ -74,7 +74,7 @@ class MEG(object):
 
         class ibc(SubDomain):
             def inside(self, x, on_boundary):
-                return on_boundary and _ibc(x)
+                return on_boundary # and _ibc(x)
 
         _Impedance = ibc()
         _Impedance.mark(boundary_markers, 0)
@@ -165,25 +165,25 @@ class MEG(object):
             u_c0  = plot(u.sub(0), mode='color', cmap='jet')
             u_ax0.set_title('x component of real part')
             u_cbar0 = plt.colorbar(u_c0)
-            u_cbar0.formatter.set_powerlimits((0, 0))
+            # u_cbar0.formatter.set_powerlimits((0, 0))
 
             u_ax1 = plt.subplot(222)
             u_c1  = plot(u.sub(1), mode='color', cmap='jet')
             u_ax1.set_title('y component of real part')
             u_cbar1 = plt.colorbar(u_c1)
-            u_cbar1.formatter.set_powerlimits((0, 0))
+            # u_cbar1.formatter.set_powerlimits((0, 0))
 
             v_ax0 = plt.subplot(223)
             v_c0  = plot(v.sub(0), mode='color', cmap='jet')
             v_ax0.set_title('x component of imag part')
             v_cbar0 = plt.colorbar(v_c0)
-            v_cbar0.formatter.set_powerlimits((0, 0))
+            # v_cbar0.formatter.set_powerlimits((0, 0))
 
             v_ax1 = plt.subplot(224)
             v_c1 = plot(v.sub(1), mode='color', cmap='jet')
             v_ax1.set_title('x component of real part')
             v_cbar1 = plt.colorbar(v_c1)
-            v_cbar1.formatter.set_powerlimits((0, 0))
+            # v_cbar1.formatter.set_powerlimits((0, 0))
 
 
 
