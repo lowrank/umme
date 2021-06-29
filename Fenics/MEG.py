@@ -7,7 +7,7 @@ class MEG(object):
     Solve time harmonic Maxwell's equation. 
     curl (mu^{-1} curl E) - C E = F     in \Omega,
                          n x E  = 0     on dbc,
-            mu^{-1}curl E - B E = g     on ibc.
+            mu^{-1}curl E - B E_T = g     on ibc.
 
     dbc, ibc refer Dirichlet boundary (PEC) and Impedance
     boundary (1st order approximation to ABC). 
@@ -74,7 +74,7 @@ class MEG(object):
 
         class ibc(SubDomain):
             def inside(self, x, on_boundary):
-                return on_boundary # and _ibc(x)
+                return on_boundary and _ibc(x)
 
         _Impedance = ibc()
         _Impedance.mark(boundary_markers, 0)
