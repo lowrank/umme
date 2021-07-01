@@ -61,13 +61,13 @@ end
 str = fgets(fid);
 info = sscanf(str,'%c %*s %*s', 1);
 
-while info ~= 'F'
+while info ~= 'F' &&  info ~= 'L'
     str = fgets(fid);
     info = sscanf(str,'%c %*s %*s', 1);
 end
 
 str = fgets(fid);
-str = fgets(fid);
+% str = fgets(fid);
 
 data = str2num(str);
 

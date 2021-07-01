@@ -1,4 +1,5 @@
 from dolfin import *
+from mshr import *
 import matplotlib.pyplot as plt
 from matplotlib import interactive
 import numpy as np
@@ -40,11 +41,11 @@ class MEG(object):
 
         self.dbc          = args.dbc                  # Dirichlet boundary func
         
-        self._set_finite_element(args.scalar_elem, args.vector_elem, args.deg)
-        self._set_coefficient()
-        self._set_boundary(args.ibc)
+        self.set_finite_element(args.scalar_elem, args.vector_elem, args.deg)
+        self.set_coefficient()
+        self.set_boundary(args.ibc)
 
-    def _set_finite_element(self, scalar_elem, vector_elem, deg):
+    def set_finite_element(self, scalar_elem, vector_elem, deg):
         self.s_elem = FiniteElement(
             scalar_elem, cell=self.mesh.ufl_cell(), degree=deg)
 
@@ -61,7 +62,7 @@ class MEG(object):
 
         self.n = FacetNormal(self.mesh)
 
-    def _set_coefficient(self):
+    def set_coefficient(self):
         # The coefficients are 'ufl.algebra.Product'
         self.C_r = self.frequency * self.frequency * self.permittivity
         self.C_c = self.frequency * self.conductivity
@@ -69,12 +70,12 @@ class MEG(object):
         self.B_r = 0.0
         self.B_c = self.Lambda * self.frequency 
 
-    def _set_boundary(self, _ibc):
+    def set_boundary(self, _ibc):
         boundary_markers = MeshFunction('size_t', self.mesh, dim = 1)
 
         class ibc(SubDomain):
             def inside(self, x, on_boundary):
-                return on_boundary # and _ibc(x)
+                return on_boundary  and _ibc(x)
 
         _Impedance = ibc()
         _Impedance.mark(boundary_markers, 0)
@@ -165,25 +166,25 @@ class MEG(object):
             u_c0  = plot(u.sub(0), mode='color', cmap='jet')
             u_ax0.set_title('x component of real part')
             u_cbar0 = plt.colorbar(u_c0)
-            # u_cbar0.formatter.set_powerlimits((0, 0))
+            u_cbar0.formatter.set_powerlimits((0, 0))
 
             u_ax1 = plt.subplot(222)
             u_c1  = plot(u.sub(1), mode='color', cmap='jet')
             u_ax1.set_title('y component of real part')
             u_cbar1 = plt.colorbar(u_c1)
-            # u_cbar1.formatter.set_powerlimits((0, 0))
+            u_cbar1.formatter.set_powerlimits((0, 0))
 
             v_ax0 = plt.subplot(223)
             v_c0  = plot(v.sub(0), mode='color', cmap='jet')
             v_ax0.set_title('x component of imag part')
             v_cbar0 = plt.colorbar(v_c0)
-            # v_cbar0.formatter.set_powerlimits((0, 0))
+            v_cbar0.formatter.set_powerlimits((0, 0))
 
             v_ax1 = plt.subplot(224)
             v_c1 = plot(v.sub(1), mode='color', cmap='jet')
             v_ax1.set_title('x component of real part')
             v_cbar1 = plt.colorbar(v_c1)
-            # v_cbar1.formatter.set_powerlimits((0, 0))
+            v_cbar1.formatter.set_powerlimits((0, 0))
 
 
 

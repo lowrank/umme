@@ -1,9 +1,9 @@
 from MEG import *
 
 # domain 
-mesh = RectangleMesh(Point(0., 0.), Point(1., 1.), 200, 200)
+mesh =generate_mesh(Circle(Point(0., 0.), 1.), 80) # RectangleMesh(Point(0., 0.), Point(1., 1.), 80, 80)
 
-freq    = 4 * (2 * np.pi)
+freq    = 8 * (2 * np.pi)
 Lbd     = 1.0
 dim     = 2
 
@@ -14,12 +14,12 @@ sigma   = Constant(0.0000)
 
 class MyFunctionExpression(UserExpression):
     def eval(self, values, x):
-        if (x[0]-0.15)**2 + (x[1]-0.3)**2 - 0.04 > 0:
+        if (x[0]-0.15)**2 + (x[1]-0.3)**2 - 0.04 < 0:
             values[0] = 0.5 * ( 1.0 + cos(sqrt((x[0]-0.15)**2 + (x[1]-0.3)**2) * 10.0 * np.pi / 2))
         else:
             values[0] = 0
 
-        if (x[0]-0.35)**2 + (x[1]-0.5)**2 - 0.04 > 0:
+        if (x[0]-0.35)**2 + (x[1]-0.5)**2 - 0.04 <    0:
             values[1] = 0.2 * (1.0 + cos(sqrt((x[0]-0.35)**2 + (x[1]-0.5)**2) * 10.0 * np.pi / 2))
         else:
             values[1] = 0
@@ -31,14 +31,6 @@ fr      = Constant((0.0, 0.0))
 fc      = Constant((0.0, 0.0))
 gr      = Constant((0.0, 0.0)) # Expression(('x[1]*x[1]', 'x[0]*x[0]'), degree=2)
 gc      = Constant((0.0, 0.0))
-
-
-def dbc(x):
-    return x[1] < DOLFIN_EPS 
-
-def ibc(x):
-    return x[0] < DOLFIN_EPS or x[0] > 1.0 - DOLFIN_EPS or x[1] > 1.0 - DOLFIN_EPS or x[1] < DOLFIN_EPS
-
 class Arg(object):
     pass 
 
@@ -78,3 +70,41 @@ plt.figure(1)
 m.visualize(Er, Ec)
 plt.show()
 interactive(True)
+
+# def F_ibc(x):
+#     return x[0] < DOLFIN_EPS  # Left Side
+
+
+# m.imp_r = Expression(('cos(p * x[0])', 'cos(p * x[0])'), degree=2, p=freq)
+# m.imp_c = Expression(('-sin(p * x[0])', '-sin(p * x[0])'), degree=2, p=freq)
+
+# m.set_boundary(F_ibc)
+
+# m.source_r = Constant((0.0, 0.0))
+# m.source_c = Constant((0.0, 0.0))
+
+# A, b = m.construct_variational_form()
+
+# Fr, Fc = m.solve(A, b)
+
+# # plt.figure(1)
+# # m.visualize(Fr, Fc)
+# # plt.show()
+# # interactive(True)
+
+# # phi_r = Function(m.scalar_space)
+# # phi_c = Function(m.scalar_space)
+
+# # phi_r = Er.sub(0) * Fr.sub(0) - Ec.sub(0) * Fc.sub(0) + Er.sub(1) * Fr.sub(1) - Ec.sub(1) * Fc.sub(1)
+
+# Eri = interpolate(Er, m.vector_space)
+# Fri = interpolate(Fr, m.vector_space)
+
+# phi = project( Eri.sub(0) * Fri.sub(0), m.scalar_space)
+
+# plot(phi, mode='color', cmap='jet')
+# plt.show()
+# interactive(True)
+
+
+
